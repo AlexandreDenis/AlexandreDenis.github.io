@@ -121,8 +121,9 @@ AppModule = __decorate([
         ],
         imports: [
             __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
-            __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormsModule */],
-            __WEBPACK_IMPORTED_MODULE_10__routing_app_routing_module__["a" /* AppRoutingModule */]
+            __WEBPACK_IMPORTED_MODULE_2__angular_forms__["c" /* FormsModule */],
+            __WEBPACK_IMPORTED_MODULE_10__routing_app_routing_module__["a" /* AppRoutingModule */],
+            __WEBPACK_IMPORTED_MODULE_2__angular_forms__["d" /* ReactiveFormsModule */]
         ],
         providers: [
             __WEBPACK_IMPORTED_MODULE_7__dataaccess_cache_service__["a" /* CacheService */],
@@ -183,7 +184,7 @@ var _a;
 /***/ "../../../../../src/app/authentification/login/login.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"form-container\">\r\n    <form>\r\n        <div class=\"form-group\">\r\n            <label for=\"usernameInput\">Username</label>\r\n            <input type=\"text\" id=\"usernameInput\" name=\"username\" class=\"form-control\" placeholder=\"Enter username\" [(ngModel)]=\"credentials.username\">\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"passwordInput\">Password</label>\r\n            <input type=\"password\" id=\"passwordInput\" name=\"password\" class=\"form-control\" placeholder=\"Enter password\" [(ngModel)]=\"credentials.password\">\r\n        </div>\r\n        <button type=\"submit\" class=\"btn btn-primary\" (click)=\"onLoginButtonClicked()\">Log in</button>\r\n        <a routerLink=\"/signin\">No account yet? Sign in !</a>\r\n    </form>\r\n</div>"
+module.exports = "<div class=\"form-container\">\r\n    <form [formGroup]=\"formGroup\" (ngSubmit)=\"onLoginButtonClicked()\">\r\n        <div class=\"form-group\">\r\n            <label for=\"usernameInput\">Username</label>\r\n            <input type=\"text\" id=\"usernameInput\" name=\"username\" class=\"form-control\" placeholder=\"Enter username\" formControlName=\"usernameInput\">\r\n            <div *ngIf=\"usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)\">\r\n                <div *ngIf=\"usernameInput.errors.required\" class=\"alert alert-danger\">Last name is required</div>\r\n                <div *ngIf=\"usernameInput.errors.maxlength\" class=\"alert alert-danger\">Last name length must be inferior or equal to 16 characters</div>\r\n                <div *ngIf=\"usernameInput.errors.pattern\" class=\"alert alert-danger\">Last name must only contain letters or numbers</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"passwordInput\">Password</label>\r\n            <input type=\"password\" id=\"passwordInput\" name=\"password\" class=\"form-control\" placeholder=\"Enter password\" formControlName=\"passwordInput\">\r\n            <div *ngIf=\"passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)\">\r\n                <div *ngIf=\"passwordInput.errors.required\" class=\"alert alert-danger\">Password is required</div>\r\n                <div *ngIf=\"passwordInput.errors.maxlength\" class=\"alert alert-danger\">Password length must be inferior or equal to 64 characters</div>\r\n            </div>\r\n        </div>\r\n        <button type=\"submit\" class=\"btn btn-primary\" [disabled]=\"!formGroup.valid\">Log in</button>\r\n        <a routerLink=\"/signin\">No account yet? Sign in !</a>\r\n    </form>\r\n</div>"
 
 /***/ }),
 
@@ -193,7 +194,8 @@ module.exports = "<div class=\"form-container\">\r\n    <form>\r\n        <div c
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_forms__ = __webpack_require__("../../../forms/@angular/forms.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -205,19 +207,41 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 var LoginComponent = (function () {
     function LoginComponent(cache) {
         this.cache = cache;
-        this.credentials = {
-            username: '',
-            password: ''
-        };
     }
+    LoginComponent.prototype.ngOnInit = function () {
+        this.formGroup = new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["b" /* FormGroup */]({
+            'usernameInput': new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["a" /* FormControl */](null, [
+                __WEBPACK_IMPORTED_MODULE_1__angular_forms__["e" /* Validators */].required,
+                __WEBPACK_IMPORTED_MODULE_1__angular_forms__["e" /* Validators */].maxLength(16),
+                __WEBPACK_IMPORTED_MODULE_1__angular_forms__["e" /* Validators */].pattern(new RegExp("^[a-zA-Z0-9]+$"))
+            ]),
+            'passwordInput': new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["a" /* FormControl */](null, [
+                __WEBPACK_IMPORTED_MODULE_1__angular_forms__["e" /* Validators */].required,
+                __WEBPACK_IMPORTED_MODULE_1__angular_forms__["e" /* Validators */].maxLength(64)
+            ])
+        });
+    };
+    ;
+    Object.defineProperty(LoginComponent.prototype, "usernameInput", {
+        // getters
+        get: function () { return this.formGroup.get('usernameInput'); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(LoginComponent.prototype, "passwordInput", {
+        get: function () { return this.formGroup.get('passwordInput'); },
+        enumerable: true,
+        configurable: true
+    });
     LoginComponent.prototype.onLoginButtonClicked = function () {
         // TODO
         console.log("Authentication requested");
-        console.log("username", this.credentials.username);
-        console.log("password", this.credentials.password);
+        console.log("username", this.usernameInput.value);
+        console.log("password", this.passwordInput.value);
     };
     ;
     return LoginComponent;
@@ -227,7 +251,7 @@ LoginComponent = __decorate([
         selector: 'login',
         template: __webpack_require__("../../../../../src/app/authentification/login/login.component.html")
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object])
 ], LoginComponent);
 
 var _a;
@@ -238,7 +262,7 @@ var _a;
 /***/ "../../../../../src/app/authentification/signin/signin.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"form-container\">\r\n    <form>\r\n        <div class=\"form-group\">\r\n                <label for=\"firstNameInput\">First name</label>\r\n                <input type=\"text\" id=\"firstNameInput\" name=\"firstName\" class=\"form-control\" placeholder=\"Enter first name\" [(ngModel)]=\"userInfo.firstName\">\r\n        </div>\r\n        <div class=\"form-group\">\r\n                <label for=\"lastNameInput\">Last name</label>\r\n                <input type=\"text\" id=\"lastNameInput\" name=\"lastName\" class=\"form-control\" placeholder=\"Enter last name\" [(ngModel)]=\"userInfo.lastName\">\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"usernameInput\">Username</label>\r\n            <input type=\"text\" id=\"usernameInput\" name=\"username\" class=\"form-control\" placeholder=\"Enter username\" [(ngModel)]=\"userInfo.username\">\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"passwordInput\">Password</label>\r\n            <input type=\"password\" id=\"passwordInput\" name=\"password\" class=\"form-control\" placeholder=\"Enter password\" [(ngModel)]=\"userInfo.password\">\r\n        </div>\r\n        <button type=\"submit\" class=\"btn btn-primary\" (click)=\"onSigninButtonClicked()\">Sign in</button>\r\n        <a routerLink=\"/login\">Already an account? Log in !</a>\r\n    </form>\r\n</div>"
+module.exports = "<div class=\"form-container\">\r\n    <form [formGroup]=\"formGroup\" (ngSubmit)=\"onSigninButtonClicked()\">\r\n        <div class=\"form-group\">\r\n                <label for=\"firstNameInput\">First name*</label>\r\n                <input type=\"text\" id=\"firstNameInput\" name=\"firstName\" class=\"form-control\" placeholder=\"Enter first name\" formControlName=\"firstNameInput\" required>\r\n                <div *ngIf=\"firstNameInput.invalid && (firstNameInput.dirty || firstNameInput.touched)\">\r\n                    <div *ngIf=\"firstNameInput.errors.required\" class=\"alert alert-danger\">First name is required</div>\r\n                    <div *ngIf=\"firstNameInput.errors.maxlength\" class=\"alert alert-danger\">First name length must be inferior or equal to 32 characters</div>\r\n                    <div *ngIf=\"firstNameInput.errors.pattern\" class=\"alert alert-danger\">First name must only contain letters</div>\r\n                </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n                <label for=\"lastNameInput\">Last name*</label>\r\n                <input type=\"text\" id=\"lastNameInput\" name=\"lastName\" class=\"form-control\" placeholder=\"Enter last name\" formControlName=\"lastNameInput\" required>\r\n                <div *ngIf=\"lastNameInput.invalid && (lastNameInput.dirty || lastNameInput.touched)\">\r\n                    <div *ngIf=\"lastNameInput.errors.required\" class=\"alert alert-danger\">Last name is required</div>\r\n                    <div *ngIf=\"lastNameInput.errors.maxlength\" class=\"alert alert-danger\">Last name length must be inferior or equal to 32 characters</div>\r\n                    <div *ngIf=\"lastNameInput.errors.pattern\" class=\"alert alert-danger\">Last name must only contain letters</div>\r\n                </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"usernameInput\">Username*</label>\r\n            <input type=\"text\" id=\"usernameInput\" name=\"username\" class=\"form-control\" placeholder=\"Enter username\" formControlName=\"usernameInput\" required>\r\n            <div *ngIf=\"usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)\">\r\n                <div *ngIf=\"usernameInput.errors.required\" class=\"alert alert-danger\">Last name is required</div>\r\n                <div *ngIf=\"usernameInput.errors.maxlength\" class=\"alert alert-danger\">Last name length must be inferior or equal to 16 characters</div>\r\n                <div *ngIf=\"usernameInput.errors.pattern\" class=\"alert alert-danger\">Last name must only contain letters or numbers</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"passwordInput\">Password*</label>\r\n            <input type=\"password\" id=\"passwordInput\" name=\"password\" class=\"form-control\" placeholder=\"Enter password\" formControlName=\"passwordInput\" required>\r\n            <div *ngIf=\"passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)\">\r\n                <div *ngIf=\"passwordInput.errors.required\" class=\"alert alert-danger\">Password is required</div>\r\n                <div *ngIf=\"passwordInput.errors.maxlength\" class=\"alert alert-danger\">Password length must be inferior or equal to 64 characters</div>\r\n            </div>\r\n        </div>\r\n        <button type=\"submit\" class=\"btn btn-primary\" [disabled]=\"!formGroup.valid\">Sign in</button>\r\n        <a routerLink=\"/login\">Already an account? Log in !</a>\r\n    </form>\r\n</div>"
 
 /***/ }),
 
@@ -249,9 +273,10 @@ module.exports = "<div class=\"form-container\">\r\n    <form>\r\n        <div c
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SigninComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__enum__ = __webpack_require__("../../../../../src/app/enum.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_forms__ = __webpack_require__("../../../forms/@angular/forms.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__enum__ = __webpack_require__("../../../../../src/app/enum.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -266,36 +291,84 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var SigninComponent = (function () {
     function SigninComponent(router, authService, toastService) {
         this.router = router;
         this.authService = authService;
         this.toastService = toastService;
-        this.userInfo = {
-            id: -1,
-            firstName: '',
-            lastName: '',
-            username: '',
-            password: ''
-        };
     }
     ;
+    SigninComponent.prototype.ngOnInit = function () {
+        this.formGroup = new __WEBPACK_IMPORTED_MODULE_2__angular_forms__["b" /* FormGroup */]({
+            'firstNameInput': new __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormControl */](null, [
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].required,
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].maxLength(32),
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].pattern(new RegExp("^[a-zA-Z]+$"))
+            ]),
+            'lastNameInput': new __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormControl */](null, [
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].required,
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].maxLength(32),
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].pattern(new RegExp("^[a-zA-Z]+$"))
+            ]),
+            'usernameInput': new __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormControl */](null, [
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].required,
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].maxLength(16),
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].pattern(new RegExp("^[a-zA-Z0-9]+$"))
+            ]),
+            'passwordInput': new __WEBPACK_IMPORTED_MODULE_2__angular_forms__["a" /* FormControl */](null, [
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].required,
+                __WEBPACK_IMPORTED_MODULE_2__angular_forms__["e" /* Validators */].maxLength(64)
+            ])
+        });
+    };
+    ;
+    Object.defineProperty(SigninComponent.prototype, "firstNameInput", {
+        // getters
+        get: function () { return this.formGroup.get('firstNameInput'); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SigninComponent.prototype, "lastNameInput", {
+        get: function () { return this.formGroup.get('lastNameInput'); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SigninComponent.prototype, "usernameInput", {
+        get: function () { return this.formGroup.get('usernameInput'); },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SigninComponent.prototype, "passwordInput", {
+        get: function () { return this.formGroup.get('passwordInput'); },
+        enumerable: true,
+        configurable: true
+    });
     SigninComponent.prototype.onSigninButtonClicked = function () {
-        if (!this.authService.isUserAlreadyExisting(this.userInfo.username)) {
+        // generate the User instance from the form values
+        var userInfo = {
+            id: -1,
+            firstName: this.firstNameInput.value,
+            lastName: this.lastNameInput.value,
+            username: this.usernameInput.value,
+            password: this.passwordInput.value
+        };
+        // check if user not already exists
+        if (!this.authService.isUserAlreadyExisting(userInfo.username)) {
             // delegate the creation of a user to the AuthService
-            if (this.authService.createUser(this.userInfo)) {
+            if (this.authService.createUser(userInfo)) {
                 // display a success toast
-                this.toastService.requestToastDisplay("Registration succeeded", __WEBPACK_IMPORTED_MODULE_4__enum__["a" /* ToastType */].INFO);
+                this.toastService.requestToastDisplay("Registration succeeded", __WEBPACK_IMPORTED_MODULE_5__enum__["a" /* ToastType */].INFO);
                 this.router.navigate(['/login']);
             }
             else {
                 // display an error toast
-                this.toastService.requestToastDisplay("Registration failed", __WEBPACK_IMPORTED_MODULE_4__enum__["a" /* ToastType */].ERROR);
+                this.toastService.requestToastDisplay("Registration failed", __WEBPACK_IMPORTED_MODULE_5__enum__["a" /* ToastType */].ERROR);
             }
         }
         else {
             // display an error toast
-            this.toastService.requestToastDisplay("Registration failed: '" + this.userInfo.username + "' user already exists", __WEBPACK_IMPORTED_MODULE_4__enum__["a" /* ToastType */].ERROR);
+            this.toastService.requestToastDisplay("Registration failed: '" + userInfo.username + "' user already exists", __WEBPACK_IMPORTED_MODULE_5__enum__["a" /* ToastType */].ERROR);
         }
     };
     ;
@@ -306,7 +379,7 @@ SigninComponent = __decorate([
         selector: 'signin',
         template: __webpack_require__("../../../../../src/app/authentification/signin/signin.component.html")
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__auth_service__["a" /* AuthService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__["a" /* ToastService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__["a" /* ToastService */]) === "function" && _c || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__auth_service__["a" /* AuthService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_4__toast_toast_service__["a" /* ToastService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__toast_toast_service__["a" /* ToastService */]) === "function" && _c || Object])
 ], SigninComponent);
 
 var _a, _b, _c;

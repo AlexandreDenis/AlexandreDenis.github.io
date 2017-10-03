@@ -85,16 +85,22 @@ AppComponent = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__authentification_login_login_component__ = __webpack_require__("../../../../../src/app/authentification/login/login.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__authentification_signin_signin_component__ = __webpack_require__("../../../../../src/app/authentification/signin/signin.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__toast_toast_component__ = __webpack_require__("../../../../../src/app/toast/toast.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__routing_app_routing_module__ = __webpack_require__("../../../../../src/app/routing/app-routing.module.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chat_main_main_component__ = __webpack_require__("../../../../../src/app/chat/main/main.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__authentification_encryption_service__ = __webpack_require__("../../../../../src/app/authentification/encryption.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__chat_messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__routing_app_routing_module__ = __webpack_require__("../../../../../src/app/routing/app-routing.module.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
+
+
 
 
 
@@ -117,18 +123,21 @@ AppModule = __decorate([
             __WEBPACK_IMPORTED_MODULE_3__app_component__["a" /* AppComponent */],
             __WEBPACK_IMPORTED_MODULE_4__authentification_login_login_component__["a" /* LoginComponent */],
             __WEBPACK_IMPORTED_MODULE_5__authentification_signin_signin_component__["a" /* SigninComponent */],
-            __WEBPACK_IMPORTED_MODULE_6__toast_toast_component__["a" /* ToastComponent */]
+            __WEBPACK_IMPORTED_MODULE_6__toast_toast_component__["a" /* ToastComponent */],
+            __WEBPACK_IMPORTED_MODULE_7__chat_main_main_component__["a" /* MainComponent */]
         ],
         imports: [
             __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
             __WEBPACK_IMPORTED_MODULE_2__angular_forms__["c" /* FormsModule */],
-            __WEBPACK_IMPORTED_MODULE_10__routing_app_routing_module__["a" /* AppRoutingModule */],
+            __WEBPACK_IMPORTED_MODULE_13__routing_app_routing_module__["a" /* AppRoutingModule */],
             __WEBPACK_IMPORTED_MODULE_2__angular_forms__["d" /* ReactiveFormsModule */]
         ],
         providers: [
-            __WEBPACK_IMPORTED_MODULE_7__dataaccess_cache_service__["a" /* CacheService */],
-            __WEBPACK_IMPORTED_MODULE_8__authentification_auth_service__["a" /* AuthService */],
-            __WEBPACK_IMPORTED_MODULE_9__toast_toast_service__["a" /* ToastService */]
+            __WEBPACK_IMPORTED_MODULE_8__dataaccess_cache_service__["a" /* CacheService */],
+            __WEBPACK_IMPORTED_MODULE_9__authentification_auth_service__["a" /* AuthService */],
+            __WEBPACK_IMPORTED_MODULE_10__toast_toast_service__["a" /* ToastService */],
+            __WEBPACK_IMPORTED_MODULE_11__authentification_encryption_service__["a" /* EncryptionService */],
+            __WEBPACK_IMPORTED_MODULE_12__chat_messenger_service__["a" /* Messenger */]
         ],
         bootstrap: [__WEBPACK_IMPORTED_MODULE_3__app_component__["a" /* AppComponent */]]
     })
@@ -145,6 +154,7 @@ AppModule = __decorate([
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AuthService; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__encryption_service__ = __webpack_require__("../../../../../src/app/authentification/encryption.service.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -156,9 +166,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 var AuthService = (function () {
-    function AuthService(cache) {
+    function AuthService(cache, encryption) {
         this.cache = cache;
+        this.encryption = encryption;
+        this.isLoggedIn = false;
     }
     ;
     AuthService.prototype.isUserAlreadyExisting = function (username) {
@@ -166,18 +179,70 @@ var AuthService = (function () {
     };
     ;
     AuthService.prototype.createUser = function (userInfo) {
+        // encrypt the password
+        userInfo.password = this.encryption.encrypt(userInfo.password);
+        // ask cache saving
         return this.cache.createUser(userInfo);
     };
     ;
+    AuthService.prototype.tryLogin = function (username, password) {
+        this.isLoggedIn = false;
+        var user = this.cache.getUser(username);
+        if (user != undefined) {
+            var encryptedPwd = this.encryption.encrypt(password);
+            if (user.password == encryptedPwd) {
+                this.isLoggedIn = true;
+            }
+        }
+        return this.isLoggedIn;
+    };
+    ;
+    AuthService.prototype.logout = function () {
+        this.isLoggedIn = false;
+    };
     return AuthService;
 }());
 AuthService = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* Injectable */])(),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__encryption_service__["a" /* EncryptionService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__encryption_service__["a" /* EncryptionService */]) === "function" && _b || Object])
 ], AuthService);
 
-var _a;
+var _a, _b;
 //# sourceMappingURL=auth.service.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/authentification/encryption.service.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return EncryptionService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_crypto_js__ = __webpack_require__("../../../../crypto-js/index.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_crypto_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_crypto_js__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+
+var EncryptionService = (function () {
+    function EncryptionService() {
+    }
+    EncryptionService.prototype.encrypt = function (word) {
+        var hash = Object(__WEBPACK_IMPORTED_MODULE_1_crypto_js__["SHA256"])(word);
+        return hash.toString(__WEBPACK_IMPORTED_MODULE_1_crypto_js__["enc"].Base64);
+    };
+    ;
+    return EncryptionService;
+}());
+EncryptionService = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* Injectable */])()
+], EncryptionService);
+
+//# sourceMappingURL=encryption.service.js.map
 
 /***/ }),
 
@@ -195,7 +260,11 @@ module.exports = "<div class=\"form-container\">\r\n    <form [formGroup]=\"form
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LoginComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_forms__ = __webpack_require__("../../../forms/@angular/forms.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__enum__ = __webpack_require__("../../../../../src/app/enum.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -208,9 +277,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
+
+
+
 var LoginComponent = (function () {
-    function LoginComponent(cache) {
+    function LoginComponent(cache, authService, toastService, router) {
         this.cache = cache;
+        this.authService = authService;
+        this.toastService = toastService;
+        this.router = router;
     }
     LoginComponent.prototype.ngOnInit = function () {
         this.formGroup = new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["b" /* FormGroup */]({
@@ -238,10 +314,19 @@ var LoginComponent = (function () {
         configurable: true
     });
     LoginComponent.prototype.onLoginButtonClicked = function () {
-        // TODO
         console.log("Authentication requested");
-        console.log("username", this.usernameInput.value);
-        console.log("password", this.passwordInput.value);
+        var username = this.usernameInput.value, password = this.passwordInput.value;
+        // try to login
+        if (this.authService.tryLogin(username, password)) {
+            // display a success toast
+            this.toastService.requestToastDisplay("Connexion succeeded", __WEBPACK_IMPORTED_MODULE_6__enum__["a" /* ToastType */].INFO);
+            // open the chat
+            this.router.navigate(['/main']);
+        }
+        else {
+            // display an error toast
+            this.toastService.requestToastDisplay("Connexion failed: bad login/password", __WEBPACK_IMPORTED_MODULE_6__enum__["a" /* ToastType */].ERROR);
+        }
     };
     ;
     return LoginComponent;
@@ -251,10 +336,10 @@ LoginComponent = __decorate([
         selector: 'login',
         template: __webpack_require__("../../../../../src/app/authentification/login/login.component.html")
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_3__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4__auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__auth_service__["a" /* AuthService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_5__toast_toast_service__["a" /* ToastService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__toast_toast_service__["a" /* ToastService */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["a" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["a" /* Router */]) === "function" && _d || Object])
 ], LoginComponent);
 
-var _a;
+var _a, _b, _c, _d;
 //# sourceMappingURL=login.component.js.map
 
 /***/ }),
@@ -387,12 +472,20 @@ var _a, _b, _c;
 
 /***/ }),
 
-/***/ "../../../../../src/app/dataaccess/cache.service.ts":
+/***/ "../../../../../src/app/chat/main/main.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "This is the chat !\r\n<button type=\"button\" class=\"btn btn-primary\" (click)=\"onButtonClicked()\">Send</button>"
+
+/***/ }),
+
+/***/ "../../../../../src/app/chat/main/main.component.ts":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CacheService; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MainComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -402,6 +495,90 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+
+
+var MainComponent = (function () {
+    function MainComponent(messenger) {
+        this.messenger = messenger;
+        this.counter = 0;
+    }
+    ;
+    MainComponent.prototype.onButtonClicked = function () {
+        this.messenger.Send("Message " + this.counter);
+        ++this.counter;
+    };
+    ;
+    return MainComponent;
+}());
+MainComponent = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["o" /* Component */])({
+        selector: 'main',
+        template: __webpack_require__("../../../../../src/app/chat/main/main.component.html")
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__messenger_service__["a" /* Messenger */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__messenger_service__["a" /* Messenger */]) === "function" && _a || Object])
+], MainComponent);
+
+var _a;
+//# sourceMappingURL=main.component.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/chat/messenger.service.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Messenger; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var Messenger = (function () {
+    function Messenger(cache) {
+        this.cache = cache;
+    }
+    ;
+    Messenger.prototype.Send = function (msg) {
+        this.cache.sendMessage(msg);
+    };
+    ;
+    return Messenger;
+}());
+Messenger = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* Injectable */])(),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object])
+], Messenger);
+
+var _a;
+//# sourceMappingURL=messenger.service.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/dataaccess/cache.service.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CacheService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib__ = __webpack_require__("../../../../../src/app/lib.ts");
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
 
 var prefixKey = "angular2-chat-app/";
 var STORAGE_KEYS = {
@@ -416,6 +593,7 @@ var CacheService = (function () {
         //window.localStorage.clear();
         this.storage = window.localStorage;
         this.users = [];
+        this.test = 0;
         // init local storage if there isn't already one
         var hasStorage = this.storage.getItem(STORAGE_KEYS.HAS_STORAGE);
         if (hasStorage !== 'true') {
@@ -427,8 +605,12 @@ var CacheService = (function () {
         }
         // recovering of the storage
         this.users = JSON.parse(this.storage.getItem(STORAGE_KEYS.USERS));
-        var usernames = this.users.map(function (user) { return user.username; });
-        console.log("Registered users:", usernames);
+        //let usernames = this.users.map(user => user.username);
+        //console.log("Registered users:", this.users);
+        // add listener to detect cache modifications        
+        Object(__WEBPACK_IMPORTED_MODULE_1__lib__["a" /* addEvent */])(window, 'storage', function (event) {
+            console.log(event.newValue);
+        });
     }
     ;
     CacheService.prototype.getUsers = function () {
@@ -466,6 +648,24 @@ var CacheService = (function () {
         }
         return res;
     };
+    ;
+    CacheService.prototype.getUser = function (username) {
+        var user = null;
+        for (var _i = 0, _a = this.users; _i < _a.length; _i++) {
+            var currUser = _a[_i];
+            if (currUser.username === username) {
+                user = currUser;
+                break;
+            }
+        }
+        return user;
+    };
+    ;
+    CacheService.prototype.sendMessage = function (msg) {
+        this.storage.setItem("test", "this is a test " + this.test);
+        ++this.test;
+    };
+    ;
     return CacheService;
 }());
 CacheService = __decorate([
@@ -491,6 +691,23 @@ var ToastType;
 
 /***/ }),
 
+/***/ "../../../../../src/app/lib.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = addEvent;
+function addEvent(to, type, fn) {
+    if (document.addEventListener) {
+        to.addEventListener(type, fn, false);
+    }
+    else {
+        to['on' + type] = fn;
+    }
+}
+//# sourceMappingURL=lib.js.map
+
+/***/ }),
+
 /***/ "../../../../../src/app/routing/app-routing.module.ts":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -498,8 +715,10 @@ var ToastType;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppRoutingModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__authentification_login_login_component__ = __webpack_require__("../../../../../src/app/authentification/login/login.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__authentification_signin_signin_component__ = __webpack_require__("../../../../../src/app/authentification/signin/signin.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__auth_guard_service__ = __webpack_require__("../../../../../src/app/routing/auth-guard.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__authentification_login_login_component__ = __webpack_require__("../../../../../src/app/authentification/login/login.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__authentification_signin_signin_component__ = __webpack_require__("../../../../../src/app/authentification/signin/signin.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__chat_main_main_component__ = __webpack_require__("../../../../../src/app/chat/main/main.component.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -510,10 +729,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
+
+
 var routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' },
-    { path: 'login', component: __WEBPACK_IMPORTED_MODULE_2__authentification_login_login_component__["a" /* LoginComponent */] },
-    { path: 'signin', component: __WEBPACK_IMPORTED_MODULE_3__authentification_signin_signin_component__["a" /* SigninComponent */] }
+    { path: 'login', component: __WEBPACK_IMPORTED_MODULE_3__authentification_login_login_component__["a" /* LoginComponent */] },
+    { path: 'signin', component: __WEBPACK_IMPORTED_MODULE_4__authentification_signin_signin_component__["a" /* SigninComponent */] },
+    { path: 'main',
+        component: __WEBPACK_IMPORTED_MODULE_5__chat_main_main_component__["a" /* MainComponent */],
+        canActivate: [__WEBPACK_IMPORTED_MODULE_2__auth_guard_service__["a" /* AuthGuard */]] }
 ];
 var AppRoutingModule = (function () {
     function AppRoutingModule() {
@@ -523,11 +747,58 @@ var AppRoutingModule = (function () {
 AppRoutingModule = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["M" /* NgModule */])({
         imports: [__WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* RouterModule */].forRoot(routes)],
-        exports: [__WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* RouterModule */]]
+        exports: [__WEBPACK_IMPORTED_MODULE_1__angular_router__["b" /* RouterModule */]],
+        providers: [__WEBPACK_IMPORTED_MODULE_2__auth_guard_service__["a" /* AuthGuard */]]
     })
 ], AppRoutingModule);
 
 //# sourceMappingURL=app-routing.module.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/routing/auth-guard.service.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AuthGuard; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var AuthGuard = (function () {
+    function AuthGuard(authService, router) {
+        this.authService = authService;
+        this.router = router;
+    }
+    ;
+    AuthGuard.prototype.canActivate = function () {
+        // if not logged in
+        if (!this.authService.isLoggedIn) {
+            // redirect to the login page
+            this.router.navigate(['/login']);
+        }
+        return this.authService.isLoggedIn;
+    };
+    return AuthGuard;
+}());
+AuthGuard = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* Injectable */])(),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__angular_router__["a" /* Router */]) === "function" && _b || Object])
+], AuthGuard);
+
+var _a, _b;
+//# sourceMappingURL=auth-guard.service.js.map
 
 /***/ }),
 

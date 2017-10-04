@@ -86,18 +86,20 @@ AppComponent = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__authentification_signin_signin_component__ = __webpack_require__("../../../../../src/app/authentification/signin/signin.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__toast_toast_component__ = __webpack_require__("../../../../../src/app/toast/toast.component.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__chat_main_main_component__ = __webpack_require__("../../../../../src/app/chat/main/main.component.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__authentification_encryption_service__ = __webpack_require__("../../../../../src/app/authentification/encryption.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__chat_messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__routing_app_routing_module__ = __webpack_require__("../../../../../src/app/routing/app-routing.module.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__chat_messagebox_messagebox_component__ = __webpack_require__("../../../../../src/app/chat/messagebox/messagebox.component.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__authentification_encryption_service__ = __webpack_require__("../../../../../src/app/authentification/encryption.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__chat_messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__routing_app_routing_module__ = __webpack_require__("../../../../../src/app/routing/app-routing.module.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
 
 
 
@@ -124,20 +126,21 @@ AppModule = __decorate([
             __WEBPACK_IMPORTED_MODULE_4__authentification_login_login_component__["a" /* LoginComponent */],
             __WEBPACK_IMPORTED_MODULE_5__authentification_signin_signin_component__["a" /* SigninComponent */],
             __WEBPACK_IMPORTED_MODULE_6__toast_toast_component__["a" /* ToastComponent */],
-            __WEBPACK_IMPORTED_MODULE_7__chat_main_main_component__["a" /* MainComponent */]
+            __WEBPACK_IMPORTED_MODULE_7__chat_main_main_component__["a" /* MainComponent */],
+            __WEBPACK_IMPORTED_MODULE_8__chat_messagebox_messagebox_component__["a" /* MessageBoxComponent */]
         ],
         imports: [
             __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
             __WEBPACK_IMPORTED_MODULE_2__angular_forms__["c" /* FormsModule */],
-            __WEBPACK_IMPORTED_MODULE_13__routing_app_routing_module__["a" /* AppRoutingModule */],
+            __WEBPACK_IMPORTED_MODULE_14__routing_app_routing_module__["a" /* AppRoutingModule */],
             __WEBPACK_IMPORTED_MODULE_2__angular_forms__["d" /* ReactiveFormsModule */]
         ],
         providers: [
-            __WEBPACK_IMPORTED_MODULE_8__dataaccess_cache_service__["a" /* CacheService */],
-            __WEBPACK_IMPORTED_MODULE_9__authentification_auth_service__["a" /* AuthService */],
-            __WEBPACK_IMPORTED_MODULE_10__toast_toast_service__["a" /* ToastService */],
-            __WEBPACK_IMPORTED_MODULE_11__authentification_encryption_service__["a" /* EncryptionService */],
-            __WEBPACK_IMPORTED_MODULE_12__chat_messenger_service__["a" /* Messenger */]
+            __WEBPACK_IMPORTED_MODULE_9__dataaccess_cache_service__["a" /* CacheService */],
+            __WEBPACK_IMPORTED_MODULE_10__authentification_auth_service__["a" /* AuthService */],
+            __WEBPACK_IMPORTED_MODULE_11__toast_toast_service__["a" /* ToastService */],
+            __WEBPACK_IMPORTED_MODULE_12__authentification_encryption_service__["a" /* EncryptionService */],
+            __WEBPACK_IMPORTED_MODULE_13__chat_messenger_service__["a" /* Messenger */]
         ],
         bootstrap: [__WEBPACK_IMPORTED_MODULE_3__app_component__["a" /* AppComponent */]]
     })
@@ -172,6 +175,7 @@ var AuthService = (function () {
         this.cache = cache;
         this.encryption = encryption;
         this.isLoggedIn = false;
+        this.idUser = -1;
     }
     ;
     AuthService.prototype.isUserAlreadyExisting = function (username) {
@@ -187,11 +191,13 @@ var AuthService = (function () {
     ;
     AuthService.prototype.tryLogin = function (username, password) {
         this.isLoggedIn = false;
-        var user = this.cache.getUser(username);
+        this.idUser = -1;
+        var user = this.cache.getUserFromName(username);
         if (user != undefined) {
             var encryptedPwd = this.encryption.encrypt(password);
             if (user.password == encryptedPwd) {
                 this.isLoggedIn = true;
+                this.idUser = user.id;
             }
         }
         return this.isLoggedIn;
@@ -199,7 +205,13 @@ var AuthService = (function () {
     ;
     AuthService.prototype.logout = function () {
         this.isLoggedIn = false;
+        this.idUser = -1;
     };
+    ;
+    AuthService.prototype.getCurrentUserId = function () {
+        return this.idUser;
+    };
+    ;
     return AuthService;
 }());
 AuthService = __decorate([
@@ -288,6 +300,7 @@ var LoginComponent = (function () {
         this.toastService = toastService;
         this.router = router;
     }
+    ;
     LoginComponent.prototype.ngOnInit = function () {
         this.formGroup = new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["b" /* FormGroup */]({
             'usernameInput': new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["a" /* FormControl */](null, [
@@ -475,7 +488,7 @@ var _a, _b, _c;
 /***/ "../../../../../src/app/chat/main/main.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "This is the chat !\r\n<button type=\"button\" class=\"btn btn-primary\" (click)=\"onButtonClicked()\">Send</button>"
+module.exports = "<!-- Messages box -->\r\n<message-box></message-box>\r\n\r\n<!-- Send form -->\r\n<form [formGroup]=\"formGroup\" (ngSubmit)=\"onSendButtonClicked()\" id=\"send-form\">\r\n    <div class=\"input-group\">\r\n        <input type=\"text\"  id=\"messageInput\" name=\"message\" class=\"form-control\" placeholder=\"Enter your message...\" aria-label=\"Enter your message...\" maxlength=\"{{maxSize}}\" formControlName=\"messageInput\">\r\n        <span class=\"input-group-btn\">\r\n            <button class=\"btn btn-primary\" type=\"submit\" [disabled]=\"!formGroup.valid\">Send</button>\r\n        </span>\r\n    </div>\r\n</form>"
 
 /***/ }),
 
@@ -485,7 +498,10 @@ module.exports = "This is the chat !\r\n<button type=\"button\" class=\"btn btn-
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MainComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_forms__ = __webpack_require__("../../../forms/@angular/forms.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__enum__ = __webpack_require__("../../../../../src/app/enum.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -497,15 +513,41 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
+
+
 var MainComponent = (function () {
-    function MainComponent(messenger) {
+    function MainComponent(messenger, toastService) {
         this.messenger = messenger;
-        this.counter = 0;
+        this.toastService = toastService;
+        this.maxSize = 64; // max size for messages
     }
     ;
-    MainComponent.prototype.onButtonClicked = function () {
-        this.messenger.Send("Message " + this.counter);
-        ++this.counter;
+    MainComponent.prototype.ngOnInit = function () {
+        this.formGroup = new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["b" /* FormGroup */]({
+            'messageInput': new __WEBPACK_IMPORTED_MODULE_1__angular_forms__["a" /* FormControl */](null, [
+                __WEBPACK_IMPORTED_MODULE_1__angular_forms__["e" /* Validators */].required,
+                __WEBPACK_IMPORTED_MODULE_1__angular_forms__["e" /* Validators */].maxLength(this.maxSize)
+            ])
+        });
+    };
+    ;
+    Object.defineProperty(MainComponent.prototype, "messageInput", {
+        // getters
+        get: function () { return this.formGroup.get('messageInput'); },
+        enumerable: true,
+        configurable: true
+    });
+    MainComponent.prototype.onSendButtonClicked = function () {
+        var message = this.messageInput.value;
+        if (this.messenger.Send(message)) {
+            // empty the message field
+            this.messageInput.setValue("");
+        }
+        else {
+            // display an error toast
+            this.toastService.requestToastDisplay("Unable to send the message", __WEBPACK_IMPORTED_MODULE_4__enum__["a" /* ToastType */].ERROR);
+        }
     };
     ;
     return MainComponent;
@@ -515,11 +557,97 @@ MainComponent = __decorate([
         selector: 'main',
         template: __webpack_require__("../../../../../src/app/chat/main/main.component.html")
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__messenger_service__["a" /* Messenger */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__messenger_service__["a" /* Messenger */]) === "function" && _a || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__messenger_service__["a" /* Messenger */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__messenger_service__["a" /* Messenger */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__["a" /* ToastService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__["a" /* ToastService */]) === "function" && _b || Object])
 ], MainComponent);
 
-var _a;
+var _a, _b;
 //# sourceMappingURL=main.component.js.map
+
+/***/ }),
+
+/***/ "../../../../../src/app/chat/messagebox/messagebox.component.css":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".message {\r\n    text-align: left;\r\n}\r\n\r\n.message > p {\r\n    display: inline-block;\r\n    background-color: #4080FF;\r\n    border-radius: 0.25rem;\r\n    padding: 5px 10px;\r\n    color: white;\r\n}\r\n\r\n.message.own-message {\r\n     text-align: right;\r\n}\r\n\r\n.message.own-message > p {\r\n    background-color: #F1F0F0;\r\n    color: #4B4F56;\r\n}\r\n\r\n.meta-part {\r\n    color: darkgrey;\r\n}", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
+/***/ "../../../../../src/app/chat/messagebox/messagebox.component.html":
+/***/ (function(module, exports) {
+
+module.exports = "<div id=\"message-box\">\r\n    <div *ngFor=\"let msg of messages\" class=\"message\" [class.own-message]=\"fromCurrentUser(msg.idUser)\">\r\n        <div class=\"meta-part author-part small\" *ngIf=\"!fromCurrentUser(msg.idUser)\">{{ getUsername(msg.idUser) }}</div>\r\n        <p class=\"text-part\">{{ msg.text }}</p>\r\n    </div>\r\n</div>"
+
+/***/ }),
+
+/***/ "../../../../../src/app/chat/messagebox/messagebox.component.ts":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MessageBoxComponent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var MessageBoxComponent = (function () {
+    function MessageBoxComponent(cache, authService) {
+        this.cache = cache;
+        this.authService = authService;
+        this.messages = [];
+    }
+    ;
+    MessageBoxComponent.prototype.ngOnInit = function () {
+        // recover the messages from the cache
+        this.messages = this.cache.getMessages();
+    };
+    ;
+    MessageBoxComponent.prototype.fromCurrentUser = function (idUser) {
+        return (idUser == this.authService.getCurrentUserId());
+    };
+    ;
+    MessageBoxComponent.prototype.getUsername = function (idUser) {
+        var username = "";
+        var user = this.cache.getUser(idUser);
+        if (user != undefined) {
+            username = user.username;
+        }
+        return username;
+    };
+    ;
+    return MessageBoxComponent;
+}());
+MessageBoxComponent = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["o" /* Component */])({
+        selector: 'message-box',
+        template: __webpack_require__("../../../../../src/app/chat/messagebox/messagebox.component.html"),
+        styles: [__webpack_require__("../../../../../src/app/chat/messagebox/messagebox.component.css")]
+    }),
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */]) === "function" && _b || Object])
+], MessageBoxComponent);
+
+var _a, _b;
+//# sourceMappingURL=messagebox.component.js.map
 
 /***/ }),
 
@@ -530,6 +658,7 @@ var _a;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Messenger; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -541,23 +670,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 
 
+
 var Messenger = (function () {
-    function Messenger(cache) {
+    function Messenger(cache, authService) {
         this.cache = cache;
+        this.authService = authService;
     }
     ;
     Messenger.prototype.Send = function (msg) {
-        this.cache.sendMessage(msg);
+        // create a Message instance
+        var newMsg = {
+            idUser: this.authService.getCurrentUserId(),
+            timestamp: Date.now(),
+            text: msg
+        };
+        return this.cache.sendMessage(newMsg);
     };
     ;
     return Messenger;
 }());
 Messenger = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["C" /* Injectable */])(),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */]) === "function" && _b || Object])
 ], Messenger);
 
-var _a;
+var _a, _b;
 //# sourceMappingURL=messenger.service.js.map
 
 /***/ }),
@@ -585,15 +722,18 @@ var STORAGE_KEYS = {
     HAS_STORAGE: prefixKey + "HAS_STORAGE",
     WLOCK: prefixKey + "WLOCK",
     USERS: prefixKey + "USERS",
-    NEXT_USER_ID: prefixKey + "NEXT_USER_ID"
+    NEXT_USER_ID: prefixKey + "NEXT_USER_ID",
+    MESSAGES: prefixKey + "MESSAGES"
 };
 var CacheService = (function () {
     function CacheService() {
         // Clear the local storage for debug
         //window.localStorage.clear();
+        var _this = this;
         this.storage = window.localStorage;
+        // data
         this.users = [];
-        this.test = 0;
+        this.messages = [];
         // init local storage if there isn't already one
         var hasStorage = this.storage.getItem(STORAGE_KEYS.HAS_STORAGE);
         if (hasStorage !== 'true') {
@@ -602,19 +742,45 @@ var CacheService = (function () {
             this.storage.setItem(STORAGE_KEYS.WLOCK, "false");
             this.storage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
             this.storage.setItem(STORAGE_KEYS.NEXT_USER_ID, "0");
+            this.storage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify([]));
         }
         // recovering of the storage
         this.users = JSON.parse(this.storage.getItem(STORAGE_KEYS.USERS));
+        this.messages = JSON.parse(this.storage.getItem(STORAGE_KEYS.MESSAGES));
         //let usernames = this.users.map(user => user.username);
         //console.log("Registered users:", this.users);
-        // add listener to detect cache modifications        
+        // add listener to detect cache modifications
         Object(__WEBPACK_IMPORTED_MODULE_1__lib__["a" /* addEvent */])(window, 'storage', function (event) {
-            console.log(event.newValue);
+            var newValue = JSON.parse(event.newValue);
+            switch (event.key) {
+                case STORAGE_KEYS.USERS: {
+                    console.log("sync users");
+                    var cnt = newValue.length;
+                    if (newValue != undefined && cnt > 0) {
+                        var newUser = newValue[cnt - 1];
+                        _this.users.push(newUser);
+                    }
+                    break;
+                }
+                case STORAGE_KEYS.MESSAGES: {
+                    console.log("sync messages");
+                    var cnt = newValue.length;
+                    if (newValue != undefined && cnt > 0) {
+                        var newMsg = newValue[cnt - 1];
+                        _this.messages.push(newMsg);
+                    }
+                    break;
+                }
+            }
         });
     }
     ;
     CacheService.prototype.getUsers = function () {
         return this.users;
+    };
+    ;
+    CacheService.prototype.getMessages = function () {
+        return this.messages;
     };
     ;
     CacheService.prototype.isUserAlreadyExisting = function (username) {
@@ -639,6 +805,8 @@ var CacheService = (function () {
             this.storage.setItem(STORAGE_KEYS.WLOCK, 'true');
             this.users.push(userInfo);
             this.storage.setItem(STORAGE_KEYS.USERS, JSON.stringify(this.users));
+            // update the next user ID
+            this.storage.setItem(STORAGE_KEYS.NEXT_USER_ID, "" + (userInfo.id + 1));
             // unlock the write on the cache
             this.storage.setItem(STORAGE_KEYS.WLOCK, 'false');
             res = true;
@@ -649,11 +817,11 @@ var CacheService = (function () {
         return res;
     };
     ;
-    CacheService.prototype.getUser = function (username) {
+    CacheService.prototype.getUserFrom = function (key, value) {
         var user = null;
         for (var _i = 0, _a = this.users; _i < _a.length; _i++) {
             var currUser = _a[_i];
-            if (currUser.username === username) {
+            if (currUser[key] === value) {
                 user = currUser;
                 break;
             }
@@ -661,9 +829,26 @@ var CacheService = (function () {
         return user;
     };
     ;
+    CacheService.prototype.getUser = function (idUser) {
+        return this.getUserFrom("id", idUser);
+    };
+    ;
+    CacheService.prototype.getUserFromName = function (username) {
+        return this.getUserFrom("username", username);
+    };
+    ;
     CacheService.prototype.sendMessage = function (msg) {
-        this.storage.setItem("test", "this is a test " + this.test);
-        ++this.test;
+        var success = false;
+        var isAlreadyLocked = (this.storage.getItem(STORAGE_KEYS.WLOCK) === 'true');
+        if (!isAlreadyLocked) {
+            this.messages.push(msg);
+            this.storage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(this.messages));
+            success = true;
+        }
+        else {
+            console.error("Couldn't send message because of cache lock");
+        }
+        return success;
     };
     ;
     return CacheService;
@@ -810,7 +995,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, "/* source: https://www.w3schools.com/howto/howto_js_snackbar.asp */\r\n\r\n#snackbar {\r\n    visibility: hidden; /* Hidden by default. Visible on click */\r\n    min-width: 250px; /* Set a default minimum width */\r\n    background-color: #333; /* Black background color */\r\n    color: #fff; /* White text color */\r\n    text-align: center; /* Centered text */\r\n    border-radius: 2px; /* Rounded borders */\r\n    padding: 16px; /* Padding */\r\n    position: fixed; /* Sit on top of the screen */\r\n    z-index: 1; /* Add a z-index if needed */\r\n    bottom: 1px;\r\n    left: 50%;\r\n    -webkit-transform: translate(-50%,0%);\r\n            transform: translate(-50%,0%);\r\n}\r\n\r\n/* Show the snackbar when clicking on a button (class added with JavaScript) */\r\n#snackbar.show {\r\n    visibility: visible; /* Show the snackbar */\r\n\r\n/* Add animation: Take 0.5 seconds to fade in and out the snackbar. \r\nHowever, delay the fade out process for 2.5 seconds */\r\n    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;\r\n    animation: fadein 0.5s, fadeout 0.5s 2.5s;\r\n}\r\n\r\n#snackbar.error {\r\n    background-color: #F8D7DA;\r\n    color: #921217;\r\n}\r\n\r\n#snackbar.info {\r\n    background-color: #D1ECF1;\r\n    color: #0C75AB;\r\n}\r\n\r\n/* Animations to fade the snackbar in and out */\r\n@-webkit-keyframes fadein {\r\n    from {bottom: 0; opacity: 0;} \r\n    to {bottom: 1px; opacity: 1;}\r\n}\r\n\r\n@keyframes fadein {\r\n    from {bottom: 0; opacity: 0;}\r\n    to {bottom: 1px; opacity: 1;}\r\n}\r\n\r\n@-webkit-keyframes fadeout {\r\n    from {bottom: 1px; opacity: 1;} \r\n    to {bottom: 0; opacity: 0;}\r\n}\r\n\r\n@keyframes fadeout {\r\n    from {bottom: 1px; opacity: 1;}\r\n    to {bottom: 0; opacity: 0;}\r\n}", ""]);
+exports.push([module.i, "/* source: https://www.w3schools.com/howto/howto_js_snackbar.asp */\r\n\r\n#snackbar {\r\n    visibility: hidden; /* Hidden by default. Visible on click */\r\n    min-width: 250px; /* Set a default minimum width */\r\n    background-color: #333; /* Black background color */\r\n    color: #fff; /* White text color */\r\n    text-align: center; /* Centered text */\r\n    border-radius: 2px; /* Rounded borders */\r\n    padding: 16px; /* Padding */\r\n    position: fixed; /* Sit on top of the screen */\r\n    z-index: 1000; /* Add a z-index if needed */\r\n    bottom: 1px;\r\n    left: 50%;\r\n    -webkit-transform: translate(-50%,0%);\r\n            transform: translate(-50%,0%);\r\n}\r\n\r\n/* Show the snackbar when clicking on a button (class added with JavaScript) */\r\n#snackbar.show {\r\n    visibility: visible; /* Show the snackbar */\r\n\r\n/* Add animation: Take 0.5 seconds to fade in and out the snackbar. \r\nHowever, delay the fade out process for 2.5 seconds */\r\n    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;\r\n    animation: fadein 0.5s, fadeout 0.5s 2.5s;\r\n}\r\n\r\n#snackbar.error {\r\n    background-color: #F8D7DA;\r\n    color: #921217;\r\n}\r\n\r\n#snackbar.info {\r\n    background-color: #D1ECF1;\r\n    color: #0C75AB;\r\n}\r\n\r\n/* Animations to fade the snackbar in and out */\r\n@-webkit-keyframes fadein {\r\n    from {bottom: 0; opacity: 0;} \r\n    to {bottom: 1px; opacity: 1;}\r\n}\r\n\r\n@keyframes fadein {\r\n    from {bottom: 0; opacity: 0;}\r\n    to {bottom: 1px; opacity: 1;}\r\n}\r\n\r\n@-webkit-keyframes fadeout {\r\n    from {bottom: 1px; opacity: 1;} \r\n    to {bottom: 0; opacity: 0;}\r\n}\r\n\r\n@keyframes fadeout {\r\n    from {bottom: 1px; opacity: 1;}\r\n    to {bottom: 0; opacity: 0;}\r\n}", ""]);
 
 // exports
 

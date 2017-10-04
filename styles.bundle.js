@@ -35,7 +35,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, "#app-title {\n    text-align: center;\n}\n\n.form-container > form {\n    position: absolute;\n    top: 50%;\n    left:50%;\n    -webkit-transform: translate(-50%,-50%);\n            transform: translate(-50%,-50%);\n    width: 50%;\n}\n\nbutton:hover {\n    cursor: pointer;\n}\n\nbutton[disabled]:hover {\n    cursor: not-allowed;\n}", ""]);
+exports.push([module.i, "#app-title {\n    text-align: center;\n}\n\napp-root > .container {\n    height: 100vh;\n}\n\nmain {\n    height: calc(100% - 52px);\n}\n\n#message-box {\n    height: calc(100% - 38px);\n    overflow-y: auto;\n}\n\n.form-container > form {\n    position: absolute;\n    top: 50%;\n    left:50%;\n    -webkit-transform: translate(-50%,-50%);\n            transform: translate(-50%,-50%);\n    width: 50%;\n}\n\nbutton:hover {\n    cursor: pointer;\n}\n\nbutton[disabled]:hover {\n    cursor: not-allowed;\n}", ""]);
 
 // exports
 

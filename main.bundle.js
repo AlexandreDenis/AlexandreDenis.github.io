@@ -485,10 +485,28 @@ var _a, _b, _c;
 
 /***/ }),
 
+/***/ "../../../../../src/app/chat/main/main.component.css":
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "#info-user {\r\n    color: darkgrey;\r\n}", ""]);
+
+// exports
+
+
+/*** EXPORTS FROM exports-loader ***/
+module.exports = module.exports.toString();
+
+/***/ }),
+
 /***/ "../../../../../src/app/chat/main/main.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<!-- Messages box -->\r\n<message-box></message-box>\r\n\r\n<!-- Send form -->\r\n<form [formGroup]=\"formGroup\" (ngSubmit)=\"onSendButtonClicked()\" id=\"send-form\">\r\n    <div class=\"input-group\">\r\n        <input type=\"text\"  id=\"messageInput\" name=\"message\" class=\"form-control\" placeholder=\"Enter your message...\" aria-label=\"Enter your message...\" maxlength=\"{{maxSize}}\" formControlName=\"messageInput\">\r\n        <span class=\"input-group-btn\">\r\n            <button class=\"btn btn-primary\" type=\"submit\" [disabled]=\"!formGroup.valid\">Send</button>\r\n        </span>\r\n    </div>\r\n</form>"
+module.exports = "<p id=\"info-user\">Logged as: {{getCurrentUsername()}}</p>\r\n\r\n<!-- Messages box -->\r\n<message-box></message-box>\r\n\r\n<!-- Send form -->\r\n<form [formGroup]=\"formGroup\" (ngSubmit)=\"onSendButtonClicked()\" id=\"send-form\">\r\n    <div class=\"input-group\">\r\n        <span class=\"input-group-btn\">\r\n            <button class=\"btn\" type=\"button\" (click)=\"onLogoutButtonClicked()\"><i class=\"fa fa-sign-out\" aria-hidden=\"true\"></i></button>\r\n        </span>\r\n        <input type=\"text\"  id=\"messageInput\" name=\"message\" class=\"form-control\" placeholder=\"Enter your message...\" aria-label=\"Enter your message...\" maxlength=\"{{maxSize}}\" formControlName=\"messageInput\">\r\n        <span class=\"input-group-btn\">\r\n            <button class=\"btn btn-primary\" type=\"submit\" [disabled]=\"!formGroup.valid\">Send</button>\r\n        </span>\r\n    </div>\r\n</form>"
 
 /***/ }),
 
@@ -499,9 +517,12 @@ module.exports = "<!-- Messages box -->\r\n<message-box></message-box>\r\n\r\n<!
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MainComponent; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_forms__ = __webpack_require__("../../../forms/@angular/forms.es5.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__enum__ = __webpack_require__("../../../../../src/app/enum.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_router__ = __webpack_require__("../../../router/@angular/router.es5.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__messenger_service__ = __webpack_require__("../../../../../src/app/chat/messenger.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__toast_toast_service__ = __webpack_require__("../../../../../src/app/toast/toast.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__enum__ = __webpack_require__("../../../../../src/app/enum.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -516,11 +537,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
+
+
 var MainComponent = (function () {
-    function MainComponent(messenger, toastService) {
+    function MainComponent(messenger, toastService, authService, router, cache) {
         this.messenger = messenger;
         this.toastService = toastService;
-        this.maxSize = 64; // max size for messages
+        this.authService = authService;
+        this.router = router;
+        this.cache = cache;
+        this.maxSize = 128; // max size for messages
     }
     ;
     MainComponent.prototype.ngOnInit = function () {
@@ -546,8 +573,22 @@ var MainComponent = (function () {
         }
         else {
             // display an error toast
-            this.toastService.requestToastDisplay("Unable to send the message", __WEBPACK_IMPORTED_MODULE_4__enum__["a" /* ToastType */].ERROR);
+            this.toastService.requestToastDisplay("Unable to send the message", __WEBPACK_IMPORTED_MODULE_7__enum__["a" /* ToastType */].ERROR);
         }
+    };
+    ;
+    MainComponent.prototype.onLogoutButtonClicked = function () {
+        this.authService.logout();
+        this.router.navigate(["/login"]);
+    };
+    ;
+    MainComponent.prototype.getCurrentUsername = function () {
+        var username = "";
+        var user = this.cache.getUser(this.authService.getCurrentUserId());
+        if (user != undefined) {
+            username = user.username;
+        }
+        return username;
     };
     ;
     return MainComponent;
@@ -555,12 +596,13 @@ var MainComponent = (function () {
 MainComponent = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["o" /* Component */])({
         selector: 'main',
-        template: __webpack_require__("../../../../../src/app/chat/main/main.component.html")
+        template: __webpack_require__("../../../../../src/app/chat/main/main.component.html"),
+        styles: [__webpack_require__("../../../../../src/app/chat/main/main.component.css")]
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_2__messenger_service__["a" /* Messenger */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__messenger_service__["a" /* Messenger */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__["a" /* ToastService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__toast_toast_service__["a" /* ToastService */]) === "function" && _b || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_3__messenger_service__["a" /* Messenger */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__messenger_service__["a" /* Messenger */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4__toast_toast_service__["a" /* ToastService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__toast_toast_service__["a" /* ToastService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_5__authentification_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__authentification_auth_service__["a" /* AuthService */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2__angular_router__["a" /* Router */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__angular_router__["a" /* Router */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_6__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _e || Object])
 ], MainComponent);
 
-var _a, _b;
+var _a, _b, _c, _d, _e;
 //# sourceMappingURL=main.component.js.map
 
 /***/ }),
@@ -573,7 +615,7 @@ exports = module.exports = __webpack_require__("../../../../css-loader/lib/css-b
 
 
 // module
-exports.push([module.i, ".message {\r\n    text-align: left;\r\n}\r\n\r\n.message > p {\r\n    display: inline-block;\r\n    background-color: #4080FF;\r\n    border-radius: 0.25rem;\r\n    padding: 5px 10px;\r\n    color: white;\r\n}\r\n\r\n.message.own-message {\r\n     text-align: right;\r\n}\r\n\r\n.message.own-message > p {\r\n    background-color: #F1F0F0;\r\n    color: #4B4F56;\r\n}\r\n\r\n.meta-part {\r\n    color: darkgrey;\r\n}", ""]);
+exports.push([module.i, ".message {\r\n    text-align: left;\r\n}\r\n\r\n.message .message-block > p {\r\n    display: inline-block;\r\n    background-color: #4080FF;\r\n    border-radius: 0.25rem;\r\n    padding: 5px 10px;\r\n    color: white;\r\n}\r\n\r\n.message.own-message {\r\n     text-align: right;\r\n}\r\n\r\n.message.own-message .message-block > p {\r\n    background-color: #F1F0F0;\r\n    color: #4B4F56;\r\n}\r\n\r\n.meta-part {\r\n    color: darkgrey;\r\n}\r\n\r\n.message .message-block > p.text-part:hover {\r\n    cursor: pointer;\r\n}\r\n\r\n.message .message-block > p.text-part {\r\n    margin-bottom: 0rem;\r\n}\r\n\r\n.message .message-block {\r\n    margin-bottom: 1rem;\r\n}", ""]);
 
 // exports
 
@@ -586,7 +628,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/chat/messagebox/messagebox.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div id=\"message-box\">\r\n    <div *ngFor=\"let msg of messages\" class=\"message\" [class.own-message]=\"fromCurrentUser(msg.idUser)\">\r\n        <div class=\"meta-part author-part small\" *ngIf=\"!fromCurrentUser(msg.idUser)\">{{ getUsername(msg.idUser) }}</div>\r\n        <p class=\"text-part\">{{ msg.text }}</p>\r\n    </div>\r\n</div>"
+module.exports = "<div #messagebox id=\"message-box\">\r\n    <div *ngFor=\"let msg of messages;\" class=\"message\" [class.own-message]=\"fromCurrentUser(msg.idUser)\">\r\n        <div class=\"meta-part author-part small\" *ngIf=\"!fromCurrentUser(msg.idUser)\">{{ getUsername(msg.idUser) }}</div>\r\n        <div class=\"message-block\">\r\n            <p class=\"text-part noselect\" (click)=\"switchShowDate(msg)\">{{ msg.text }}</p>\r\n            <div class=\"meta-part date-part small\" *ngIf=\"msg.showDate\">{{ displayDateFromTimestamp(msg.timestamp) }}</div>\r\n        </div>\r\n    </div>\r\n</div>"
 
 /***/ }),
 
@@ -598,6 +640,7 @@ module.exports = "<div id=\"message-box\">\r\n    <div *ngFor=\"let msg of messa
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__ = __webpack_require__("../../../../../src/app/dataaccess/cache.service.ts");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__ = __webpack_require__("../../../../../src/app/authentification/auth.service.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib__ = __webpack_require__("../../../../../src/app/lib.ts");
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -610,6 +653,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var MessageBoxComponent = (function () {
     function MessageBoxComponent(cache, authService) {
         this.cache = cache;
@@ -618,8 +662,15 @@ var MessageBoxComponent = (function () {
     }
     ;
     MessageBoxComponent.prototype.ngOnInit = function () {
+        var _this = this;
         // recover the messages from the cache
         this.messages = this.cache.getMessages();
+        // scroll down when new message to display
+        this.cache.newMessageReceived.subscribe(function () { return _this.scrollDown(); });
+    };
+    ;
+    MessageBoxComponent.prototype.ngAfterViewChecked = function () {
+        this.scrollDown();
     };
     ;
     MessageBoxComponent.prototype.fromCurrentUser = function (idUser) {
@@ -635,18 +686,41 @@ var MessageBoxComponent = (function () {
         return username;
     };
     ;
+    MessageBoxComponent.prototype.displayDateFromTimestamp = function (timestamp) {
+        return Object(__WEBPACK_IMPORTED_MODULE_3__lib__["b" /* timeConverter */])(timestamp);
+    };
+    ;
+    MessageBoxComponent.prototype.switchShowDate = function (msg) {
+        if (msg.showDate == undefined) {
+            msg.showDate = true;
+        }
+        else {
+            msg.showDate = !msg.showDate;
+        }
+    };
+    ;
+    MessageBoxComponent.prototype.scrollDown = function () {
+        var elem = this.messagebox;
+        var height = elem.nativeElement.scrollHeight;
+        elem.nativeElement.scrollTop = height;
+    };
+    ;
     return MessageBoxComponent;
 }());
+__decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_16" /* ViewChild */])('messagebox'),
+    __metadata("design:type", typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["v" /* ElementRef */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_core__["v" /* ElementRef */]) === "function" && _a || Object)
+], MessageBoxComponent.prototype, "messagebox", void 0);
 MessageBoxComponent = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["o" /* Component */])({
         selector: 'message-box',
         template: __webpack_require__("../../../../../src/app/chat/messagebox/messagebox.component.html"),
         styles: [__webpack_require__("../../../../../src/app/chat/messagebox/messagebox.component.css")]
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */]) === "function" && _b || Object])
+    __metadata("design:paramtypes", [typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1__dataaccess_cache_service__["a" /* CacheService */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2__authentification_auth_service__["a" /* AuthService */]) === "function" && _c || Object])
 ], MessageBoxComponent);
 
-var _a, _b;
+var _a, _b, _c;
 //# sourceMappingURL=messagebox.component.js.map
 
 /***/ }),
@@ -706,6 +780,8 @@ var _a, _b;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CacheService; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__("../../../core/@angular/core.es5.js");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib__ = __webpack_require__("../../../../../src/app/lib.ts");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__ = __webpack_require__("../../../../rxjs/Subject.js");
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -715,6 +791,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+
 
 
 var prefixKey = "angular2-chat-app/";
@@ -733,6 +810,8 @@ var CacheService = (function () {
         // data
         this.users = [];
         this.messages = [];
+        // subjects
+        this.newMessageReceived = new __WEBPACK_IMPORTED_MODULE_2_rxjs_Subject__["Subject"]();
         // init local storage items if needed
         this.initStorageItem(STORAGE_KEYS.HAS_STORAGE, "true");
         this.initStorageItem(STORAGE_KEYS.WLOCK, "false");
@@ -766,6 +845,8 @@ var CacheService = (function () {
                 if (newValue != undefined && cnt > 0) {
                     var newMsg = newValue[cnt - 1];
                     this.messages.push(newMsg);
+                    // notify the observers that a new message has been received
+                    this.newMessageReceived.next();
                 }
                 break;
             }
@@ -849,6 +930,8 @@ var CacheService = (function () {
         if (!isAlreadyLocked) {
             this.messages.push(msg);
             this.storage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(this.messages));
+            // notify the observers that a new message has been sent
+            this.newMessageReceived.next();
             success = true;
         }
         else {
@@ -887,6 +970,7 @@ var ToastType;
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = addEvent;
+/* harmony export (immutable) */ __webpack_exports__["b"] = timeConverter;
 function addEvent(to, type, fn) {
     if (document.addEventListener) {
         to.addEventListener(type, fn, false);
@@ -894,6 +978,18 @@ function addEvent(to, type, fn) {
     else {
         to['on' + type] = fn;
     }
+}
+function timeConverter(timestamp) {
+    var a = new Date(timestamp);
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec;
+    return time;
 }
 //# sourceMappingURL=lib.js.map
 

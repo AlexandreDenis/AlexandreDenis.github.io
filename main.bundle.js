@@ -729,51 +729,57 @@ var CacheService = (function () {
     function CacheService() {
         // Clear the local storage for debug
         //window.localStorage.clear();
-        var _this = this;
         this.storage = window.localStorage;
         // data
         this.users = [];
         this.messages = [];
-        // init local storage if there isn't already one
-        var hasStorage = this.storage.getItem(STORAGE_KEYS.HAS_STORAGE);
-        if (hasStorage !== 'true') {
-            console.log("Creation of storage keys...");
-            this.storage.setItem(STORAGE_KEYS.HAS_STORAGE, "true");
-            this.storage.setItem(STORAGE_KEYS.WLOCK, "false");
-            this.storage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
-            this.storage.setItem(STORAGE_KEYS.NEXT_USER_ID, "0");
-            this.storage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify([]));
-        }
+        // init local storage items if needed
+        this.initStorageItem(STORAGE_KEYS.HAS_STORAGE, "true");
+        this.initStorageItem(STORAGE_KEYS.WLOCK, "false");
+        this.initStorageItem(STORAGE_KEYS.USERS, JSON.stringify([]));
+        this.initStorageItem(STORAGE_KEYS.NEXT_USER_ID, "0");
+        this.initStorageItem(STORAGE_KEYS.MESSAGES, JSON.stringify([]));
         // recovering of the storage
         this.users = JSON.parse(this.storage.getItem(STORAGE_KEYS.USERS));
         this.messages = JSON.parse(this.storage.getItem(STORAGE_KEYS.MESSAGES));
         //let usernames = this.users.map(user => user.username);
         //console.log("Registered users:", this.users);
         // add listener to detect cache modifications
-        Object(__WEBPACK_IMPORTED_MODULE_1__lib__["a" /* addEvent */])(window, 'storage', function (event) {
-            var newValue = JSON.parse(event.newValue);
-            switch (event.key) {
-                case STORAGE_KEYS.USERS: {
-                    console.log("sync users");
-                    var cnt = newValue.length;
-                    if (newValue != undefined && cnt > 0) {
-                        var newUser = newValue[cnt - 1];
-                        _this.users.push(newUser);
-                    }
-                    break;
-                }
-                case STORAGE_KEYS.MESSAGES: {
-                    console.log("sync messages");
-                    var cnt = newValue.length;
-                    if (newValue != undefined && cnt > 0) {
-                        var newMsg = newValue[cnt - 1];
-                        _this.messages.push(newMsg);
-                    }
-                    break;
-                }
-            }
-        });
+        this.handleStorageEvent = this.handleStorageEvent.bind(this);
+        Object(__WEBPACK_IMPORTED_MODULE_1__lib__["a" /* addEvent */])(window, 'storage', this.handleStorageEvent);
     }
+    CacheService.prototype.handleStorageEvent = function (event) {
+        var newValue = JSON.parse(event.newValue);
+        switch (event.key) {
+            case STORAGE_KEYS.USERS: {
+                console.log("sync users");
+                var cnt = newValue.length;
+                if (newValue != undefined && cnt > 0) {
+                    var newUser = newValue[cnt - 1];
+                    this.users.push(newUser);
+                }
+                break;
+            }
+            case STORAGE_KEYS.MESSAGES: {
+                console.log("sync messages");
+                var cnt = newValue.length;
+                if (newValue != undefined && cnt > 0) {
+                    var newMsg = newValue[cnt - 1];
+                    this.messages.push(newMsg);
+                }
+                break;
+            }
+        }
+    };
+    ;
+    CacheService.prototype.initStorageItem = function (name, defaultValue) {
+        var hasItem = this.storage.getItem(name);
+        if (!hasItem) {
+            console.log("Creation of the local storage item " + name);
+            this.storage.setItem(name, defaultValue);
+        }
+    };
+    ;
     ;
     CacheService.prototype.getUsers = function () {
         return this.users;

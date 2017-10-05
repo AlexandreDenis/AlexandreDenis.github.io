@@ -183,6 +183,8 @@ var AuthService = (function () {
     };
     ;
     AuthService.prototype.createUser = function (userInfo) {
+        if (this.isUserAlreadyExisting(userInfo.username))
+            return false;
         // encrypt the password
         userInfo.password = this.encryption.encrypt(userInfo.password);
         // ask cache saving
@@ -208,6 +210,9 @@ var AuthService = (function () {
         this.idUser = -1;
     };
     ;
+    AuthService.prototype.isLogged = function () {
+        return this.isLoggedIn;
+    };
     AuthService.prototype.getCurrentUserId = function () {
         return this.idUser;
     };
@@ -360,7 +365,7 @@ var _a, _b, _c, _d;
 /***/ "../../../../../src/app/authentification/signin/signin.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"form-container\">\r\n    <form [formGroup]=\"formGroup\" (ngSubmit)=\"onSigninButtonClicked()\">\r\n        <div class=\"form-group\">\r\n                <label for=\"firstNameInput\">First name*</label>\r\n                <input type=\"text\" id=\"firstNameInput\" name=\"firstName\" class=\"form-control\" placeholder=\"Enter first name\" formControlName=\"firstNameInput\" required>\r\n                <div *ngIf=\"firstNameInput.invalid && (firstNameInput.dirty || firstNameInput.touched)\">\r\n                    <div *ngIf=\"firstNameInput.errors.required\" class=\"alert alert-danger\">First name is required</div>\r\n                    <div *ngIf=\"firstNameInput.errors.maxlength\" class=\"alert alert-danger\">First name length must be inferior or equal to 32 characters</div>\r\n                    <div *ngIf=\"firstNameInput.errors.pattern\" class=\"alert alert-danger\">First name must only contain letters</div>\r\n                </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n                <label for=\"lastNameInput\">Last name*</label>\r\n                <input type=\"text\" id=\"lastNameInput\" name=\"lastName\" class=\"form-control\" placeholder=\"Enter last name\" formControlName=\"lastNameInput\" required>\r\n                <div *ngIf=\"lastNameInput.invalid && (lastNameInput.dirty || lastNameInput.touched)\">\r\n                    <div *ngIf=\"lastNameInput.errors.required\" class=\"alert alert-danger\">Last name is required</div>\r\n                    <div *ngIf=\"lastNameInput.errors.maxlength\" class=\"alert alert-danger\">Last name length must be inferior or equal to 32 characters</div>\r\n                    <div *ngIf=\"lastNameInput.errors.pattern\" class=\"alert alert-danger\">Last name must only contain letters</div>\r\n                </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"usernameInput\">Username*</label>\r\n            <input type=\"text\" id=\"usernameInput\" name=\"username\" class=\"form-control\" placeholder=\"Enter username\" formControlName=\"usernameInput\" required>\r\n            <div *ngIf=\"usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)\">\r\n                <div *ngIf=\"usernameInput.errors.required\" class=\"alert alert-danger\">Username is required</div>\r\n                <div *ngIf=\"usernameInput.errors.maxlength\" class=\"alert alert-danger\">Username length must be inferior or equal to 16 characters</div>\r\n                <div *ngIf=\"usernameInput.errors.pattern\" class=\"alert alert-danger\">Username must only contain letters or numbers</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n            <label for=\"passwordInput\">Password*</label>\r\n            <input type=\"password\" id=\"passwordInput\" name=\"password\" class=\"form-control\" placeholder=\"Enter password\" formControlName=\"passwordInput\" required>\r\n            <div *ngIf=\"passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)\">\r\n                <div *ngIf=\"passwordInput.errors.required\" class=\"alert alert-danger\">Password is required</div>\r\n                <div *ngIf=\"passwordInput.errors.maxlength\" class=\"alert alert-danger\">Password length must be inferior or equal to 64 characters</div>\r\n            </div>\r\n        </div>\r\n        <button type=\"submit\" class=\"btn btn-primary\" [disabled]=\"!formGroup.valid\">Sign in</button>\r\n        <a routerLink=\"/login\">Already an account? Log in !</a>\r\n    </form>\r\n</div>"
+module.exports = "<div class=\"form-container\">\r\n    <form [formGroup]=\"formGroup\" (ngSubmit)=\"onSigninButtonClicked()\">\r\n        <div class=\"app-body\">\r\n            <div class=\"form-group\">\r\n                    <label for=\"firstNameInput\">First name*</label>\r\n                    <input type=\"text\" id=\"firstNameInput\" name=\"firstName\" class=\"form-control\" placeholder=\"Enter first name\" formControlName=\"firstNameInput\" required>\r\n                    <div *ngIf=\"firstNameInput.invalid && (firstNameInput.dirty || firstNameInput.touched)\">\r\n                        <div *ngIf=\"firstNameInput.errors.required\" class=\"alert alert-danger\">First name is required</div>\r\n                        <div *ngIf=\"firstNameInput.errors.maxlength\" class=\"alert alert-danger\">First name length must be inferior or equal to 32 characters</div>\r\n                        <div *ngIf=\"firstNameInput.errors.pattern\" class=\"alert alert-danger\">First name must only contain letters</div>\r\n                    </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n                    <label for=\"lastNameInput\">Last name*</label>\r\n                    <input type=\"text\" id=\"lastNameInput\" name=\"lastName\" class=\"form-control\" placeholder=\"Enter last name\" formControlName=\"lastNameInput\" required>\r\n                    <div *ngIf=\"lastNameInput.invalid && (lastNameInput.dirty || lastNameInput.touched)\">\r\n                        <div *ngIf=\"lastNameInput.errors.required\" class=\"alert alert-danger\">Last name is required</div>\r\n                        <div *ngIf=\"lastNameInput.errors.maxlength\" class=\"alert alert-danger\">Last name length must be inferior or equal to 32 characters</div>\r\n                        <div *ngIf=\"lastNameInput.errors.pattern\" class=\"alert alert-danger\">Last name must only contain letters</div>\r\n                    </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n                <label for=\"usernameInput\">Username*</label>\r\n                <input type=\"text\" id=\"usernameInput\" name=\"username\" class=\"form-control\" placeholder=\"Enter username\" formControlName=\"usernameInput\" required>\r\n                <div *ngIf=\"usernameInput.invalid && (usernameInput.dirty || usernameInput.touched)\">\r\n                    <div *ngIf=\"usernameInput.errors.required\" class=\"alert alert-danger\">Username is required</div>\r\n                    <div *ngIf=\"usernameInput.errors.maxlength\" class=\"alert alert-danger\">Username length must be inferior or equal to 16 characters</div>\r\n                    <div *ngIf=\"usernameInput.errors.pattern\" class=\"alert alert-danger\">Username must only contain letters or numbers</div>\r\n                </div>\r\n            </div>\r\n            <div class=\"form-group\">\r\n                <label for=\"passwordInput\">Password*</label>\r\n                <input type=\"password\" id=\"passwordInput\" name=\"password\" class=\"form-control\" placeholder=\"Enter password\" formControlName=\"passwordInput\" required>\r\n                <div *ngIf=\"passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)\">\r\n                    <div *ngIf=\"passwordInput.errors.required\" class=\"alert alert-danger\">Password is required</div>\r\n                    <div *ngIf=\"passwordInput.errors.maxlength\" class=\"alert alert-danger\">Password length must be inferior or equal to 64 characters</div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <button type=\"submit\" class=\"btn btn-primary\" [disabled]=\"!formGroup.valid\">Sign in</button>\r\n        <a routerLink=\"/login\">Already an account? Log in !</a>\r\n    </form>\r\n</div>"
 
 /***/ }),
 
@@ -752,13 +757,16 @@ var Messenger = (function () {
     }
     ;
     Messenger.prototype.Send = function (msg) {
-        // create a Message instance
-        var newMsg = {
-            idUser: this.authService.getCurrentUserId(),
-            timestamp: Date.now(),
-            text: msg
-        };
-        return this.cache.sendMessage(newMsg);
+        if (this.authService.isLogged()) {
+            // create a Message instance
+            var newMsg = {
+                idUser: this.authService.getCurrentUserId(),
+                timestamp: Date.now(),
+                text: msg
+            };
+            return this.cache.sendMessage(newMsg);
+        }
+        return false;
     };
     ;
     return Messenger;
@@ -1070,12 +1078,13 @@ var AuthGuard = (function () {
     }
     ;
     AuthGuard.prototype.canActivate = function () {
+        var isLoggedIn = this.authService.isLogged();
         // if not logged in
-        if (!this.authService.isLoggedIn) {
+        if (!isLoggedIn) {
             // redirect to the login page
             this.router.navigate(['/login']);
         }
-        return this.authService.isLoggedIn;
+        return isLoggedIn;
     };
     return AuthGuard;
 }());
